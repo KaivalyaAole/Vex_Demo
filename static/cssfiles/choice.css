@@ -1,0 +1,219 @@
+
+/* Updated CSS */
+html, body {
+    margin: 0;
+    padding: 0;
+    /* width:100vw;
+    height:100vh; */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    /* overflow: hidden; */
+}
+
+.view_options {
+    display: flex;
+    justify-content: space-evenly;
+    border: 2px solid red;
+    border-radius: 8px;
+    width: 70%;
+    padding-top: 10px;
+    height: 500px;
+    /* margin-top: 5em; */
+    margin-bottom: 5em;
+    background: rgba( 251, 251, 251, 0.55 );
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    border-radius: 50px;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+    overflow: hidden; /* Ensures no overflow */
+}
+
+.view_block {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    height: 750px;
+}
+
+.gif_block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cta {
+    display: flex;
+    padding: 11px 33px;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 25px;
+    color: white;
+    background: #6225E6;
+    transition: 1s;
+    box-shadow: 6px 6px 0 black;
+    transform: skewX(-15deg);
+    border: none;
+    margin-top: 10px; /* Add some space above the button */
+}
+
+.cta:focus {
+    outline: none;
+}
+
+.cta:hover {
+    transition: 0.5s;
+    box-shadow: 10px 10px 0 #FBC638;
+}
+
+.cta .second {
+    transition: 0.5s;
+    margin-right: 0px;
+}
+
+.cta:hover .second {
+    transition: 0.5s;
+    margin-right: 45px;
+}
+
+.span {
+    transform: skewX(15deg)
+}
+
+.second {
+    width: 20px;
+    margin-left: 30px;
+    position: relative;
+    top: 12%;
+}
+
+.one {
+    transition: 0.4s;
+    transform: translateX(-60%);
+}
+
+.two {
+    transition: 0.5s;
+    transform: translateX(-30%);
+}
+
+.cta:hover .three {
+    animation: color_anim 1s infinite 0.2s;
+}
+
+.cta:hover .one {
+    transform: translateX(0%);
+    animation: color_anim 1s infinite 0.6s;
+}
+
+.cta:hover .two {
+    transform: translateX(0%);
+    animation: color_anim 1s infinite 0.4s;
+}
+
+@keyframes color_anim {
+    0% {
+        fill: white;
+    }
+
+    50% {
+        fill: #FBC638;
+    }
+
+    100% {
+        fill: white;
+    }
+}
+
+#logo_hide{
+    padding-top: 10px;
+}
+.home-logo {
+    height: 200px;
+    width: 200px;
+    display: block;
+margin-left: auto;
+margin-right: auto;
+}
+
+
+.eIPUgB {
+    position: relative;
+    text-transform: uppercase;
+    display: block;
+    font-weight: bold;
+    letter-spacing: 3px;
+    font-size: 18px;
+    color: inherit;
+}
+
+
+.NZNjc {
+    margin-top: 28px;
+    display: flex;
+    flex-flow: row;
+    -moz-box-pack: center;
+    justify-content: center;
+    -moz-box-align: center;
+    align-items: center;
+}
+
+ul {
+    list-style: none;
+}
+
+.jFPfOU:hover .Hero__LinkLabel-q7x73j-1 {
+    transform: scale(1.05);
+}
+
+.jFPfOU {
+    display: flex;
+    flex-flow: row;
+    -moz-box-pack: center;
+    justify-content: center;
+    -moz-box-align: center;
+    align-items: center;
+    appearance: none;
+    text-decoration: none;
+    margin: 0px 12px;
+    color: inherit;
+}
+
+.jHbDcG {
+    display: flex;
+    color: inherit;
+    flex-flow: row;
+    -moz-box-pack: center;
+    justify-content: center;
+    -moz-box-align: center;
+    align-items: center;
+    appearance: none;
+    text-decoration: none;
+    margin: 0px 12px;
+}
+
+:root {
+    --w: 96px;
+    --h: 112px;
+    --xspace: calc(var(--w) / 2);
+    --yspace: calc(var(--h) / 4 - 1px);
+    --speed: 1.5s;
+    --text-fade-duration: 3s;
+}
+
+#footer {
+    width: 100%;
+    height: 5rem;
+    background-color: #282839;
+    color: inherit;
+    text-align: center;
+    padding: 10px 0;
+
+    bottom: 0;
+    /* display: flex;
+    justify-content: space-evenly; */
+    background: rgba(86, 80, 80, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(2.5px);
+    -webkit-backdrop-filter: blur(2.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+  }
