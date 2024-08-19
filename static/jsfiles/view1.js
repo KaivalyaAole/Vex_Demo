@@ -83,8 +83,6 @@ function fill_metadata(csvContent) {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      console.log("Local Storage src file: " + source_filename)
-      console.log("Local Storage trg file: " + target_filename)
       return response.json();
     })
     .then(data => {
