@@ -121,7 +121,6 @@ function fill_metadata(csvContent) {
         lstItem.appendChild(svgElement);
 
         const nameText = document.createTextNode(data2[key]['name']);
-        console.log("nameText : " + nameText)
         lstItem.appendChild(nameText);
 
         const subList = document.createElement("div");
