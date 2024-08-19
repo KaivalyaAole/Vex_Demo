@@ -8,50 +8,37 @@ var maxx2, maxy2, maxz2;
 var source_filename = localStorage.getItem("FILE 1");
 var target_filename = localStorage.getItem("FILE 2");
 
+if (!source_filename) { source_filename = "binary-1"; }
+
+if (!target_filename) { target_filename = "binary-2"; }
+
 // var resetButton = document.createElement("button");
 // resetButton.id = "resetButton";
 // resetButton.innerHTML = "Reset";
 // document.getElementById("myDiv").insertAdjacentElement('afterend', resetButton);
 function get_list_item(text_node) {
-    const lstItem = document.createElement("div");
-    lstItem.className = "list-item";
-    lstItem.style.cursor = "pointer";
-
-
-    const svgNamespace = "http://www.w3.org/2000/svg";
-    const svgElement = document.createElementNS(svgNamespace, "svg");
-    svgElement.setAttribute("width", "24");
-    svgElement.setAttribute("height", "24");
-    svgElement.setAttribute("viewBox", "0 0 24 24");
-    svgElement.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
-    const polygon = document.createElementNS(svgNamespace, "polygon");
-    polygon.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
-    svgElement.appendChild(polygon);
-    svgElement.style.width = "20px";
-    svgElement.style.height = "20px";
-    lstItem.appendChild(svgElement);
-    lstItem.appendChild(text_node)
-    return lstItem
+  const lstItem = document.createElement("div");
+  lstItem.className = "list-item";
+  lstItem.style.cursor = "default";
+  lstItem.appendChild(text_node)
+  return lstItem
 }
 
 
-function get_child_list(obj,objItem) {
-    
-    
+function get_child_list(obj, objItem, filename) {
 
-    const file_name = "File: " + obj['file_name'].toString()
-    const arch_name = "Arch: " + obj['arch'].toString()
-    const compiler  = "Compiler: " + obj['compiler'].toString()
-    const deps = "Dependencies: " + obj['dependencies'].toString()
-    const linker = "Linker: " + obj['linker'].toString()
-    const os_name = "OS: " + obj['os_name'].toString()
+  const arch_name = "Arch: " + obj['arch'].toString()
+  const compiler = "Compiler: " + obj['compiler'].toString()
+  const deps = "Dependencies: " + obj['dependencies'].toString()
+  const linker = "Linker: " + obj['linker'].toString()
+  const os_name = "OS: " + obj['os_name'].toString()
 
-    objItem.appendChild(get_list_item(document.createTextNode(file_name)))
-    objItem.appendChild(get_list_item(document.createTextNode(arch_name)))
-    objItem.appendChild(get_list_item(document.createTextNode(compiler)))
-    objItem.appendChild(get_list_item(document.createTextNode(deps)))
-    objItem.appendChild(get_list_item(document.createTextNode(linker)))
-    objItem.appendChild(get_list_item(document.createTextNode(os_name)))
+  objItem.appendChild(get_list_item(document.createTextNode(("File: " + filename))))
+  objItem.appendChild(get_list_item(document.createTextNode(arch_name)))
+  objItem.appendChild(get_list_item(document.createTextNode(compiler)))
+  objItem.appendChild(get_list_item(document.createTextNode(deps)))
+  objItem.appendChild(get_list_item(document.createTextNode(linker)))
+  objItem.appendChild(get_list_item(document.createTextNode(os_name)))
 }
 
 function fill_binary_info() {
@@ -61,25 +48,25 @@ function fill_binary_info() {
       'Content-Type': 'application/json'
     }
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok')
-    }
-    return response.json();
-  })
-  .then(data => {
-    const src_obj = data['src'];
-    const tgt_obj = data['tgt'];
-    const source3_html = document.getElementById('source3');
-    const source4_html = document.getElementById('source4')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      return response.json();
+    })
+    .then(data => {
+      const src_obj = data['src'];
+      const tgt_obj = data['tgt'];
+      const source3_html = document.getElementById('source3');
+      const source4_html = document.getElementById('source4')
 
-    source3_html.innerHTML = ''
-    source4_html.innerHTML = ''
+      source3_html.innerHTML = ''
+      source4_html.innerHTML = ''
 
-    get_child_list(src_obj, source3_html);
-    get_child_list(tgt_obj, source4_html);
+      get_child_list(src_obj, source3_html, source_filename);
+      get_child_list(tgt_obj, source4_html, target_filename);
 
-  })
+    })
 }
 
 
@@ -139,23 +126,21 @@ function fill_metadata(csvContent) {
         const subList = document.createElement("div");
         subList.style.display = "none";
         subList.style.paddingLeft = "40px";
-        freq_target={}
+        freq_target = {}
         for (var key1 in data2[key]['ops_refs']) {
-          if(freq_target[data2[key]['ops_refs'][key1]])
-            {
-              freq_target[data2[key]['ops_refs'][key1]]++;
-            }
-            else{
-              freq_target[data2[key]['ops_refs'][key1]]=1;
-            }
+          if (freq_target[data2[key]['ops_refs'][key1]]) {
+            freq_target[data2[key]['ops_refs'][key1]]++;
+          }
+          else {
+            freq_target[data2[key]['ops_refs'][key1]] = 1;
+          }
         }
-        for (var key1 in freq_target)
-          {
+        for (var key1 in freq_target) {
           const subListItem = document.createElement('div');
           subListItem.className = "sub-list-item";
-          subListItem.textContent =key1+":"+freq_target[key1].toString();
+          subListItem.textContent = key1 + ":" + freq_target[key1].toString();
           subList.appendChild(subListItem);
-          }
+        }
 
         lstItem.appendChild(subList);
         target2_lst.appendChild(lstItem);
@@ -196,23 +181,21 @@ function fill_metadata(csvContent) {
         const subList1 = document.createElement("div");
         subList1.style.display = "none";
         subList1.style.paddingLeft = "20px";
-        freq_target1={}
+        freq_target1 = {}
         for (var key1 in data2[key]['string_refs']) {
-          if(freq_target1[data2[key]['string_refs'][key1]])
-            {
-              freq_target1[data2[key]['string_refs'][key1]]++;
-            }
-            else{
-              freq_target1[data2[key]['string_refs'][key1]]=1;
-            }
+          if (freq_target1[data2[key]['string_refs'][key1]]) {
+            freq_target1[data2[key]['string_refs'][key1]]++;
+          }
+          else {
+            freq_target1[data2[key]['string_refs'][key1]] = 1;
+          }
         }
-        for (var key1 in freq_target1)
-          {
+        for (var key1 in freq_target1) {
           const subListItem = document.createElement('div');
           subListItem.className = "sub-list-item";
-          subListItem.textContent =key1+":"+freq_target1[key1].toString();
-          subList1.appendChild(subListItem );
-          }
+          subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
+          subList1.appendChild(subListItem);
+        }
         lstItem1.appendChild(subList1);
         target1_lst.appendChild(lstItem1);
 
@@ -259,23 +242,21 @@ function fill_metadata(csvContent) {
         const subList = document.createElement("div");
         subList.style.display = "none";
         subList.style.paddingLeft = "20px";
-        freq_target={}
+        freq_target = {}
         for (var key1 in data1[key]['ops_refs']) {
-          if(freq_target[data1[key]['ops_refs'][key1]])
-            {
-              freq_target[data1[key]['ops_refs'][key1]]++;
-            }
-            else{
-              freq_target[data1[key]['ops_refs'][key1]]=1;
-            }
+          if (freq_target[data1[key]['ops_refs'][key1]]) {
+            freq_target[data1[key]['ops_refs'][key1]]++;
+          }
+          else {
+            freq_target[data1[key]['ops_refs'][key1]] = 1;
+          }
         }
-        for (var key1 in freq_target)
-          {
+        for (var key1 in freq_target) {
           const subListItem = document.createElement('div');
           subListItem.className = "sub-list-item";
-          subListItem.textContent =key1+":"+freq_target[key1].toString();
+          subListItem.textContent = key1 + ":" + freq_target[key1].toString();
           subList.appendChild(subListItem);
-          }
+        }
         lstItem.appendChild(subList);
         source2_lst.appendChild(lstItem);
 
@@ -315,24 +296,22 @@ function fill_metadata(csvContent) {
         const subList1 = document.createElement("div");
         subList1.style.display = "none";
         subList1.style.paddingLeft = "20px";
-        
-        freq_target1={}
+
+        freq_target1 = {}
         for (var key1 in data1[key]['string_refs']) {
-          if(freq_target1[data1[key]['string_refs'][key1]])
-            {
-              freq_target1[data1[key]['string_refs'][key1]]++;
-            }
-            else{
-              freq_target1[data1[key]['string_refs'][key1]]=1;
-            }
+          if (freq_target1[data1[key]['string_refs'][key1]]) {
+            freq_target1[data1[key]['string_refs'][key1]]++;
+          }
+          else {
+            freq_target1[data1[key]['string_refs'][key1]] = 1;
+          }
         }
-        for (var key1 in freq_target1)
-          {
+        for (var key1 in freq_target1) {
           const subListItem = document.createElement('div');
           subListItem.className = "sub-list-item";
-          subListItem.textContent =key1+":"+freq_target1[key1].toString();
-          subList1.appendChild(subListItem );
-          }
+          subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
+          subList1.appendChild(subListItem);
+        }
 
         lstItem1.appendChild(subList1);
         source1_lst.appendChild(lstItem1);
@@ -378,7 +357,12 @@ function normalizeArray(array, min, max) {
 
 function init_plot() {
   var init_layout = {
-    // Other layout properties...
+    title: {
+      text: 'VexIR2Vec Similarity Scatter Plot',
+      font: {
+        size: 24  // Increase this value to make the title text larger
+      }
+    },
     modebar: {
       add: [{
         name: 'Reset View',
@@ -386,7 +370,7 @@ function init_plot() {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 30 30"><path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"></path></svg>'
 
         },
-        click: function(gd) {
+        click: function (gd) {
           reset();
         }
       }]
@@ -400,30 +384,30 @@ function init_plot() {
 
   // if (!resetButton) {
 
-    // Create the reset button if it doesn't exist
+  // Create the reset button if it doesn't exist
 
-    // resetButton = document.createElement("button");
+  // resetButton = document.createElement("button");
 
-    // resetButton.id = "resetButton";
+  // resetButton.id = "resetButton";
 
-    // resetButton.innerHTML = "Reset";
+  // resetButton.innerHTML = "Reset";
 
-    // document.getElementById("myDiv").insertAdjacentElement('afterbegin', resetButton);
+  // document.getElementById("myDiv").insertAdjacentElement('afterbegin', resetButton);
 
 
-    // Add an event listener to the reset button
+  // Add an event listener to the reset button
 
-    // resetButton.addEventListener("click", function () {
+  // resetButton.addEventListener("click", function () {
 
-      // reset();
+  // reset();
 
-    // });
+  // });
 
   // }
 
 
 
-////////////////////////////////////
+  ////////////////////////////////////
   // document.getElementById("myDiv").insertAdjacentHTML('afterend', '<button id="resetButton">Reset</button>');
   // document.getElementById("resetButton").addEventListener("click", reset);
   ///////////////////
@@ -580,7 +564,7 @@ function init_csv_parse(csvContent) {
       yaxis: { range: [-1, 0] }, // Fixed range from 0 to 1 for Y axis
       zaxis: { range: [-1, 0] }  // Fixed range from 0 to 1 for Z axis
     },
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // updatemenus: [{
     //   type: 'buttons',
@@ -799,7 +783,7 @@ function replotData(eventData, min, max) {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 30 30"><path d="M 15 3 C 12.031398 3 9.3028202 4.0834384 7.2070312 5.875 A 1.0001 1.0001 0 1 0 8.5058594 7.3945312 C 10.25407 5.9000929 12.516602 5 15 5 C 20.19656 5 24.450989 8.9379267 24.951172 14 L 22 14 L 26 20 L 30 14 L 26.949219 14 C 26.437925 7.8516588 21.277839 3 15 3 z M 4 10 L 0 16 L 3.0507812 16 C 3.562075 22.148341 8.7221607 27 15 27 C 17.968602 27 20.69718 25.916562 22.792969 24.125 A 1.0001 1.0001 0 1 0 21.494141 22.605469 C 19.74593 24.099907 17.483398 25 15 25 C 9.80344 25 5.5490109 21.062074 5.0488281 16 L 8 16 L 4 10 z"></path></svg>'
 
         },
-        click: function(gd) {
+        click: function (gd) {
           reset();
         }
       }]
@@ -940,7 +924,7 @@ function fetchContent(tgt_fid, src_fid) {
           vexir_code,
           { language: 'x86asm' }
         ).value;
-        
+
         document.getElementById('sourceSourceText').innerHTML = hljs.highlight(
           source_code,
           { language: 'C' }
@@ -1026,39 +1010,39 @@ function selected_meta_data(eventData) {
     // }
 
     let opsRefCount = {};
-let stringRefCount = {};
+    let stringRefCount = {};
 
-for (var key1 in data1[func_id]['ops_refs']) {
-  let result = data1[func_id]['ops_refs'][key1];
-  if (opsRefCount[result]) {
-    opsRefCount[result]++;
-  } else {
-    opsRefCount[result] = 1;
-  }
-}
+    for (var key1 in data1[func_id]['ops_refs']) {
+      let result = data1[func_id]['ops_refs'][key1];
+      if (opsRefCount[result]) {
+        opsRefCount[result]++;
+      } else {
+        opsRefCount[result] = 1;
+      }
+    }
 
-for (var key1 in data1[func_id]['string_refs']) {
-  let result = data1[func_id]['string_refs'][key1];
-  if (stringRefCount[result]) {
-    stringRefCount[result]++;
-  } else {
-    stringRefCount[result] = 1;
-  }
-}
+    for (var key1 in data1[func_id]['string_refs']) {
+      let result = data1[func_id]['string_refs'][key1];
+      if (stringRefCount[result]) {
+        stringRefCount[result]++;
+      } else {
+        stringRefCount[result] = 1;
+      }
+    }
 
-for (let key in opsRefCount) {
-  const lstItem = document.createElement('div');
-  lstItem.className = "list-item";
-  lstItem.textContent = `${key} (${opsRefCount[key]})`;
-  source2_lst.appendChild(lstItem);
-}
+    for (let key in opsRefCount) {
+      const lstItem = document.createElement('div');
+      lstItem.className = "list-item";
+      lstItem.textContent = `${key} (${opsRefCount[key]})`;
+      source2_lst.appendChild(lstItem);
+    }
 
-for (let key in stringRefCount) {
-  const lstItem = document.createElement('div');
-  lstItem.className = "list-item";
-  lstItem.textContent = `${key} (${stringRefCount[key]})`;
-  source1_lst.appendChild(lstItem);
-}
+    for (let key in stringRefCount) {
+      const lstItem = document.createElement('div');
+      lstItem.className = "list-item";
+      lstItem.textContent = `${key} (${stringRefCount[key]})`;
+      source1_lst.appendChild(lstItem);
+    }
   }
   else {
     // console.log("right_side pranay")
@@ -1069,8 +1053,8 @@ for (let key in stringRefCount) {
     target2_lst.innerHTML = ""
     data1 = side_bar_content[file_id];
     // console.log(data1,"pranay 111 printing")
-    
-    
+
+
     // for (var key1 in data1[func_id]['ops_refs']) {
     //   const lstItem = document.createElement('div');
     //   lstItem.className = "list-item";
@@ -1088,41 +1072,41 @@ for (let key in stringRefCount) {
     // }
 
     let opsRefCount = {};
-let stringRefCount = {};
+    let stringRefCount = {};
 
-for (var key1 in data1[func_id]['ops_refs']) {
-  let result = data1[func_id]['ops_refs'][key1];
-  if (opsRefCount[result]) {
-    opsRefCount[result]++;
-  } else {
-    opsRefCount[result] = 1;
-  }
-}
+    for (var key1 in data1[func_id]['ops_refs']) {
+      let result = data1[func_id]['ops_refs'][key1];
+      if (opsRefCount[result]) {
+        opsRefCount[result]++;
+      } else {
+        opsRefCount[result] = 1;
+      }
+    }
 
-for (var key1 in data1[func_id]['string_refs']) {
-  let result = data1[func_id]['string_refs'][key1];
-  if (stringRefCount[result]) {
-    stringRefCount[result]++;
-  } else {
-    stringRefCount[result] = 1;
-  }
-}
+    for (var key1 in data1[func_id]['string_refs']) {
+      let result = data1[func_id]['string_refs'][key1];
+      if (stringRefCount[result]) {
+        stringRefCount[result]++;
+      } else {
+        stringRefCount[result] = 1;
+      }
+    }
 
-for (let key in opsRefCount) {
-  const lstItem = document.createElement('div');
-  lstItem.className = "list-item";
-  let result = `${key} (${opsRefCount[key]})`;
-  lstItem.textContent = result;
-  target2_lst.appendChild(lstItem);
-}
+    for (let key in opsRefCount) {
+      const lstItem = document.createElement('div');
+      lstItem.className = "list-item";
+      let result = `${key} (${opsRefCount[key]})`;
+      lstItem.textContent = result;
+      target2_lst.appendChild(lstItem);
+    }
 
-for (let key in stringRefCount) {
-  const lstItem = document.createElement('div');
-  lstItem.className = "list-item";
-  let result = `${key} (${stringRefCount[key]})`;
-  lstItem.textContent = result;
-  target1_lst.appendChild(lstItem);
-}
+    for (let key in stringRefCount) {
+      const lstItem = document.createElement('div');
+      lstItem.className = "list-item";
+      let result = `${key} (${stringRefCount[key]})`;
+      lstItem.textContent = result;
+      target1_lst.appendChild(lstItem);
+    }
 
   }
 
@@ -1171,7 +1155,7 @@ function get_neighbour_metadata(eventData) {
           svgElement.style.width = "20px";
           svgElement.style.height = "20px";
           lstItem.appendChild(svgElement);
-  
+
           const nameText5 = document.createTextNode(data[file_id][key]["name"]);
           lstItem.appendChild(nameText5);
 
@@ -1180,23 +1164,21 @@ function get_neighbour_metadata(eventData) {
           subList.style.paddingLeft = "20px";
 
 
-          freq_target1={}
-          for (var key1 in  data[file_id][key]['ops_refs']) {
-            if(freq_target1[  data[file_id][key]['ops_refs'][key1]])
-              {
-                freq_target1[  data[file_id][key]['ops_refs'][key1]]++;
-              }
-              else{
-                freq_target1[  data[file_id][key]['ops_refs'][key1]]=1;
-              }
+          freq_target1 = {}
+          for (var key1 in data[file_id][key]['ops_refs']) {
+            if (freq_target1[data[file_id][key]['ops_refs'][key1]]) {
+              freq_target1[data[file_id][key]['ops_refs'][key1]]++;
+            }
+            else {
+              freq_target1[data[file_id][key]['ops_refs'][key1]] = 1;
+            }
           }
-          for (var key1 in freq_target1)
-            {
+          for (var key1 in freq_target1) {
             const subListItem = document.createElement('div');
             subListItem.className = "sub-list-item";
-            subListItem.textContent =key1+":"+freq_target1[key1].toString();
-            subList.appendChild(subListItem );
-            }
+            subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
+            subList.appendChild(subListItem);
+          }
           // for (var key1 in data[file_id][key]['ops_refs']) {
           //   const subListItem = document.createElement('div');
           //   subListItem.className = "sub-list-item";
@@ -1234,32 +1216,30 @@ function get_neighbour_metadata(eventData) {
           svgElement2.style.width = "20px";
           svgElement2.style.height = "20px";
           lstItem1.appendChild(svgElement2);
-  
+
           const nameText6 = document.createTextNode(data[file_id][key]["name"]);
           lstItem1.appendChild(nameText6);
-          
+
           const subList1 = document.createElement("div");
           subList1.style.display = "none";
           subList1.style.paddingLeft = "20px";
 
 
-          freq_target1={}
-          for (var key1 in  data[file_id][key]['string_refs']) {
-            if(freq_target1[  data[file_id][key]['string_refs'][key1]])
-              {
-                freq_target1[  data[file_id][key]['string_refs'][key1]]++;
-              }
-              else{
-                freq_target1[  data[file_id][key]['string_refs'][key1]]=1;
-              }
+          freq_target1 = {}
+          for (var key1 in data[file_id][key]['string_refs']) {
+            if (freq_target1[data[file_id][key]['string_refs'][key1]]) {
+              freq_target1[data[file_id][key]['string_refs'][key1]]++;
+            }
+            else {
+              freq_target1[data[file_id][key]['string_refs'][key1]] = 1;
+            }
           }
-          for (var key1 in freq_target1)
-            {
+          for (var key1 in freq_target1) {
             const subListItem = document.createElement('div');
             subListItem.className = "sub-list-item";
-            subListItem.textContent =key1+":"+freq_target1[key1].toString();
-            subList1.appendChild(subListItem );
-            }
+            subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
+            subList1.appendChild(subListItem);
+          }
           // for (var key1 in data[file_id][key]['string_refs']) {
           //   const subListItem = document.createElement('div');
           //   subListItem.className = "sub-list-item";
@@ -1307,30 +1287,28 @@ function get_neighbour_metadata(eventData) {
           svgElement.style.width = "20px";
           svgElement.style.height = "20px";
           lstItem.appendChild(svgElement);
-  
+
           const nameText7 = document.createTextNode(data[file_id][key]["name"]);
           lstItem.appendChild(nameText7);
 
           const subList = document.createElement("div");
           subList.style.display = "none";
           subList.style.paddingLeft = "20px";
-          freq_target1={}
-          for (var key1 in  data[file_id][key]['ops_refs']) {
-            if(freq_target1[ data[file_id][key]['ops_refs'][key1]])
-              {
-                freq_target1[ data[file_id][key]['ops_refs'][key1]]++;
-              }
-              else{
-                freq_target1[ data[file_id][key]['ops_refs'][key1]]=1;
-              }
+          freq_target1 = {}
+          for (var key1 in data[file_id][key]['ops_refs']) {
+            if (freq_target1[data[file_id][key]['ops_refs'][key1]]) {
+              freq_target1[data[file_id][key]['ops_refs'][key1]]++;
+            }
+            else {
+              freq_target1[data[file_id][key]['ops_refs'][key1]] = 1;
+            }
           }
-          for (var key1 in freq_target1)
-            {
+          for (var key1 in freq_target1) {
             const subListItem = document.createElement('div');
             subListItem.className = "sub-list-item";
-            subListItem.textContent =key1+": "+freq_target1[key1].toString();
-            subList.appendChild(subListItem );
-            }
+            subListItem.textContent = key1 + ": " + freq_target1[key1].toString();
+            subList.appendChild(subListItem);
+          }
           // for (var key1 in data[file_id][key]['ops_refs']) {
           //   const subListItem = document.createElement('div');
           //   subListItem.className = "sub-list-item";
@@ -1367,7 +1345,7 @@ function get_neighbour_metadata(eventData) {
           svgElement2.style.width = "20px";
           svgElement2.style.height = "20px";
           lstItem1.appendChild(svgElement2);
-  
+
           const nameText8 = document.createTextNode(data[file_id][key]["name"]);
           lstItem1.appendChild(nameText8);
 
@@ -1375,23 +1353,21 @@ function get_neighbour_metadata(eventData) {
           subList1.style.display = "none";
           subList1.style.paddingLeft = "20px";
 
-          freq_target1={}
-          for (var key1 in  data[file_id][key]['string_refs']) {
-            if(freq_target1[  data[file_id][key]['string_refs'][key1]])
-              {
-                freq_target1[  data[file_id][key]['string_refs'][key1]]++;
-              }
-              else{
-                freq_target1[  data[file_id][key]['string_refs'][key1]]=1;
-              }
+          freq_target1 = {}
+          for (var key1 in data[file_id][key]['string_refs']) {
+            if (freq_target1[data[file_id][key]['string_refs'][key1]]) {
+              freq_target1[data[file_id][key]['string_refs'][key1]]++;
+            }
+            else {
+              freq_target1[data[file_id][key]['string_refs'][key1]] = 1;
+            }
           }
-          for (var key1 in freq_target1)
-            {
+          for (var key1 in freq_target1) {
             const subListItem = document.createElement('div');
             subListItem.className = "sub-list-item";
-            subListItem.textContent =key1+":"+freq_target1[key1].toString();
-            subList1.appendChild(subListItem );
-            }
+            subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
+            subList1.appendChild(subListItem);
+          }
           // for (var key1 in data[file_id][key]['string_refs']) {
           //   const subListItem = document.createElement('div');
           //   subListItem.className = "sub-list-item";
