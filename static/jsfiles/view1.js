@@ -5,8 +5,9 @@ var minx1, miny1, minz1;
 var maxx1, maxy1, maxz1;
 var minx2, miny2, minz2;
 var maxx2, maxy2, maxz2;
-var source_filename = localStorage.getItem("FILE 1");
-var target_filename = localStorage.getItem("FILE 2");
+var tabid = sessionStorage.getItem('tabId');
+var source_filename = localStorage.getItem(`FILE_1_${tabid}`);
+var target_filename = localStorage.getItem(`FILE_2_${tabid}`);
 
 if (!source_filename) { source_filename = "binary-1"; }
 
@@ -25,6 +26,7 @@ function get_list_item(text_node) {
 }
 
 
+
 function get_child_list(obj, objItem, filename) {
 
   const arch_name = "Arch: " + obj['arch'].toString()
@@ -41,300 +43,294 @@ function get_child_list(obj, objItem, filename) {
   objItem.appendChild(get_list_item(document.createTextNode(os_name)))
 }
 
-function fill_binary_info() {
-  return fetch("get_binary_info", {
+async function fill_binary_info() {
+  const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
+  const response = await fetch("get_binary_info", {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Tab-ID': tabId,
     }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-      return response.json();
-    })
-    .then(data => {
-      const src_obj = data['src'];
-      const tgt_obj = data['tgt'];
-      const source3_html = document.getElementById('source3');
-      const source4_html = document.getElementById('source4')
-
-      source3_html.innerHTML = ''
-      source4_html.innerHTML = ''
-
-      get_child_list(src_obj, source3_html, source_filename);
-      get_child_list(tgt_obj, source4_html, target_filename);
-
-    })
+  });
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  const data = await response.json();
+  const src_obj = data['src'];
+  const tgt_obj = data['tgt'];
+  const source3_html = document.getElementById('source3');
+  const source4_html = document.getElementById('source4');
+  source3_html.innerHTML = '';
+  source4_html.innerHTML = '';
+  get_child_list(src_obj, source3_html, source_filename);
+  get_child_list(tgt_obj, source4_html, target_filename);
 }
 
 
-function fill_metadata(csvContent) {
+async function fill_metadata(csvContent) {
   console.log("hitting the fill_metadata")
+  const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
   fill_binary_info()
-  return fetch("get_all_metadata", {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+  try {
+    const response = await fetch("get_all_metadata", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Tab-ID': tabId,
       }
-      return response.json();
-    })
-    .then(data => {
-      // console.log(data);
-      const jsonString = JSON.stringify(data);
-      side_bar_content = data;
-      console.log(side_bar_content, "inside fill_ metadata");
-      localStorage.setItem("side_bar", jsonString);
-      source_id = data['src_id']
-      target_id = data['tgt_id']
-      data1 = data[source_id]
-      data2 = data[target_id]
-
-      const target1_lst = document.getElementById('target1');
-      const target2_lst = document.getElementById('target2');
-      target1_lst.innerHTML = "";
-      target2_lst.innerHTML = "";
-      // console.log(data2)
-      for (var key in data2) {
-        const lstItem = document.createElement("div");
-        lstItem.className = "list-item";
-        lstItem.style.cursor = "pointer";
-
-
-        const svgNamespace = "http://www.w3.org/2000/svg";
-        const svgElement = document.createElementNS(svgNamespace, "svg");
-        svgElement.setAttribute("width", "24");
-        svgElement.setAttribute("height", "24");
-        svgElement.setAttribute("viewBox", "0 0 24 24");
-        svgElement.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
-        const polygon = document.createElementNS(svgNamespace, "polygon");
-        polygon.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
-        svgElement.appendChild(polygon);
-        svgElement.style.width = "20px";
-        svgElement.style.height = "20px";
-        lstItem.appendChild(svgElement);
-
-        const nameText = document.createTextNode(data2[key]['name']);
-        lstItem.appendChild(nameText);
-
-        const subList = document.createElement("div");
-        subList.style.display = "none";
-        subList.style.paddingLeft = "40px";
-        freq_target = {}
-        for (var key1 in data2[key]['ops_refs']) {
-          if (freq_target[data2[key]['ops_refs'][key1]]) {
-            freq_target[data2[key]['ops_refs'][key1]]++;
-          }
-          else {
-            freq_target[data2[key]['ops_refs'][key1]] = 1;
-          }
-        }
-        for (var key1 in freq_target) {
-          const subListItem = document.createElement('div');
-          subListItem.className = "sub-list-item";
-          subListItem.textContent = key1 + ":" + freq_target[key1].toString();
-          subList.appendChild(subListItem);
-        }
-
-        lstItem.appendChild(subList);
-        target2_lst.appendChild(lstItem);
-        lstItem.addEventListener('click', () => {
-          svgElement.style.transform = "rotate(90deg)";
-          if (subList.style.display === "none") {
-            subList.style.display = "block";
-          } else {
-            svgElement.style.transform = "rotate(0deg)";
-            subList.style.display = "none";
-          }
-        });
-
-
-
-
-        const lstItem1 = document.createElement("div");
-        lstItem1.className = "list-item";
-        // lstItem1.textContent = data2[key]['name'];
-        lstItem1.style.cursor = "pointer";
-
-        const svgNamespace2 = "http://www.w3.org/2000/svg";
-        const svgElement2 = document.createElementNS(svgNamespace2, "svg");
-        svgElement2.setAttribute("width", "24");
-        svgElement2.setAttribute("height", "24");
-        svgElement2.setAttribute("viewBox", "0 0 24 24");
-        svgElement2.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
-        const polygon2 = document.createElementNS(svgNamespace2, "polygon");
-        polygon2.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
-        svgElement2.appendChild(polygon2);
-        svgElement2.style.width = "20px";
-        svgElement2.style.height = "20px";
-        lstItem1.appendChild(svgElement2);
-
-        const nameText2 = document.createTextNode(data2[key]['name']);
-        lstItem1.appendChild(nameText2);
-
-        const subList1 = document.createElement("div");
-        subList1.style.display = "none";
-        subList1.style.paddingLeft = "20px";
-        freq_target1 = {}
-        for (var key1 in data2[key]['string_refs']) {
-          if (freq_target1[data2[key]['string_refs'][key1]]) {
-            freq_target1[data2[key]['string_refs'][key1]]++;
-          }
-          else {
-            freq_target1[data2[key]['string_refs'][key1]] = 1;
-          }
-        }
-        for (var key1 in freq_target1) {
-          const subListItem = document.createElement('div');
-          subListItem.className = "sub-list-item";
-          subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
-          subList1.appendChild(subListItem);
-        }
-        lstItem1.appendChild(subList1);
-        target1_lst.appendChild(lstItem1);
-
-        lstItem1.addEventListener('click', () => {
-          svgElement2.style.transform = "rotate(90deg)";
-          if (subList1.style.display === "none") {
-            subList1.style.display = "block";
-          } else {
-            svgElement2.style.transform = "rotate(0deg)";
-            subList1.style.display = "none";
-          }
-        });
-      }
-
-
-
-      const source1_lst = document.getElementById('source1');
-      const source2_lst = document.getElementById('source2');
-      source1_lst.innerHTML = "";
-      source2_lst.innerHTML = "";
-
-      for (var key in data1) {
-        const lstItem = document.createElement("div");
-        lstItem.className = "list-item";
-        // lstItem.textContent = data1[key]['name'];
-        lstItem.style.cursor = "pointer";
-
-        const svgNamespace = "http://www.w3.org/2000/svg";
-        const svgElement = document.createElementNS(svgNamespace, "svg");
-        svgElement.setAttribute("width", "24");
-        svgElement.setAttribute("height", "24");
-        svgElement.setAttribute("viewBox", "0 0 24 24");
-        svgElement.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
-        const polygon = document.createElementNS(svgNamespace, "polygon");
-        polygon.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
-        svgElement.appendChild(polygon);
-        svgElement.style.width = "20px";
-        svgElement.style.height = "20px";
-        lstItem.appendChild(svgElement);
-
-        const nameText = document.createTextNode(data1[key]['name']);
-        lstItem.appendChild(nameText);
-
-        const subList = document.createElement("div");
-        subList.style.display = "none";
-        subList.style.paddingLeft = "20px";
-        freq_target = {}
-        for (var key1 in data1[key]['ops_refs']) {
-          if (freq_target[data1[key]['ops_refs'][key1]]) {
-            freq_target[data1[key]['ops_refs'][key1]]++;
-          }
-          else {
-            freq_target[data1[key]['ops_refs'][key1]] = 1;
-          }
-        }
-        for (var key1 in freq_target) {
-          const subListItem = document.createElement('div');
-          subListItem.className = "sub-list-item";
-          subListItem.textContent = key1 + ":" + freq_target[key1].toString();
-          subList.appendChild(subListItem);
-        }
-        lstItem.appendChild(subList);
-        source2_lst.appendChild(lstItem);
-
-        lstItem.addEventListener('click', () => {
-          svgElement.style.transform = "rotate(90deg)";
-          if (subList.style.display === "none") {
-            subList.style.display = "block";
-          } else {
-            svgElement.style.transform = "rotate(0deg)";
-            subList.style.display = "none";
-          }
-        });
-
-
-
-        const lstItem1 = document.createElement("div");
-        lstItem1.className = "list-item";
-        // lstItem1.textContent = data1[key]['name'];
-        lstItem1.style.cursor = "pointer";
-
-        const svgNamespace2 = "http://www.w3.org/2000/svg";
-        const svgElement2 = document.createElementNS(svgNamespace2, "svg");
-        svgElement2.setAttribute("width", "24");
-        svgElement2.setAttribute("height", "24");
-        svgElement2.setAttribute("viewBox", "0 0 24 24");
-        svgElement2.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
-        const polygon2 = document.createElementNS(svgNamespace2, "polygon");
-        polygon2.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
-        svgElement2.appendChild(polygon2);
-        svgElement2.style.width = "20px";
-        svgElement2.style.height = "20px";
-        lstItem1.appendChild(svgElement2);
-
-        const nameText2 = document.createTextNode(data1[key]['name']);
-        lstItem1.appendChild(nameText2);
-
-        const subList1 = document.createElement("div");
-        subList1.style.display = "none";
-        subList1.style.paddingLeft = "20px";
-
-        freq_target1 = {}
-        for (var key1 in data1[key]['string_refs']) {
-          if (freq_target1[data1[key]['string_refs'][key1]]) {
-            freq_target1[data1[key]['string_refs'][key1]]++;
-          }
-          else {
-            freq_target1[data1[key]['string_refs'][key1]] = 1;
-          }
-        }
-        for (var key1 in freq_target1) {
-          const subListItem = document.createElement('div');
-          subListItem.className = "sub-list-item";
-          subListItem.textContent = key1 + ":" + freq_target1[key1].toString();
-          subList1.appendChild(subListItem);
-        }
-
-        lstItem1.appendChild(subList1);
-        source1_lst.appendChild(lstItem1);
-
-        lstItem1.addEventListener('click', () => {
-          svgElement2.style.transform = "rotate(90deg)";
-          if (subList1.style.display === "none") {
-            subList1.style.display = "block";
-          } else {
-            svgElement2.style.transform = "rotate(0deg)";
-            subList1.style.display = "none";
-          }
-        });
-
-      }
-      console.log("started second");
-      init_csv_parse(csvContent);
-      return
-
-    })
-    .catch(error => {
-      console.error('Error:', error);
     });
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data_1 = await response.json();
+    // console.log(data);
+    const jsonString = JSON.stringify(data_1);
+    side_bar_content = data_1;
+    console.log(side_bar_content, "inside fill_ metadata");
+    localStorage.setItem("side_bar", jsonString);
+    source_id = data_1['src_id'];
+    target_id = data_1['tgt_id'];
+    data1 = data_1[source_id];
+    data2 = data_1[target_id];
+
+    const target1_lst = document.getElementById('target1');
+    const target2_lst = document.getElementById('target2');
+    target1_lst.innerHTML = "";
+    target2_lst.innerHTML = "";
+    // console.log(data2)
+    for (var key_3 in data2) {
+      const lstItem = document.createElement("div");
+      lstItem.className = "list-item";
+      lstItem.style.cursor = "pointer";
+
+
+      const svgNamespace = "http://www.w3.org/2000/svg";
+      const svgElement = document.createElementNS(svgNamespace, "svg");
+      svgElement.setAttribute("width", "24");
+      svgElement.setAttribute("height", "24");
+      svgElement.setAttribute("viewBox", "0 0 24 24");
+      svgElement.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
+      const polygon = document.createElementNS(svgNamespace, "polygon");
+      polygon.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
+      svgElement.appendChild(polygon);
+      svgElement.style.width = "20px";
+      svgElement.style.height = "20px";
+      lstItem.appendChild(svgElement);
+
+      const nameText = document.createTextNode(data2[key_3]['name']);
+      console.log("nameText : " + nameText);
+      lstItem.appendChild(nameText);
+
+      const subList = document.createElement("div");
+      subList.style.display = "none";
+      subList.style.paddingLeft = "40px";
+      freq_target = {};
+      for (var key1 in data2[key_3]['ops_refs']) {
+        if (freq_target[data2[key_3]['ops_refs'][key1]]) {
+          freq_target[data2[key_3]['ops_refs'][key1]]++;
+        }
+        else {
+          freq_target[data2[key_3]['ops_refs'][key1]] = 1;
+        }
+      }
+      for (var key1 in freq_target) {
+        const subListItem = document.createElement('div');
+        subListItem.className = "sub-list-item";
+        subListItem.textContent = key1 + ":" + freq_target[key1].toString();
+        subList.appendChild(subListItem);
+      }
+
+      lstItem.appendChild(subList);
+      target2_lst.appendChild(lstItem);
+      lstItem.addEventListener('click', () => {
+        svgElement.style.transform = "rotate(90deg)";
+        if (subList.style.display === "none") {
+          subList.style.display = "block";
+        } else {
+          svgElement.style.transform = "rotate(0deg)";
+          subList.style.display = "none";
+        }
+      });
+
+
+
+
+      const lstItem1 = document.createElement("div");
+      lstItem1.className = "list-item";
+      // lstItem1.textContent = data2[key]['name'];
+      lstItem1.style.cursor = "pointer";
+
+      const svgNamespace2 = "http://www.w3.org/2000/svg";
+      const svgElement2 = document.createElementNS(svgNamespace2, "svg");
+      svgElement2.setAttribute("width", "24");
+      svgElement2.setAttribute("height", "24");
+      svgElement2.setAttribute("viewBox", "0 0 24 24");
+      svgElement2.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
+      const polygon2 = document.createElementNS(svgNamespace2, "polygon");
+      polygon2.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
+      svgElement2.appendChild(polygon2);
+      svgElement2.style.width = "20px";
+      svgElement2.style.height = "20px";
+      lstItem1.appendChild(svgElement2);
+
+      const nameText2 = document.createTextNode(data2[key_3]['name']);
+      lstItem1.appendChild(nameText2);
+
+      const subList1 = document.createElement("div");
+      subList1.style.display = "none";
+      subList1.style.paddingLeft = "20px";
+      freq_target1 = {};
+      for (var key1 in data2[key_3]['string_refs']) {
+        if (freq_target1[data2[key_3]['string_refs'][key1]]) {
+          freq_target1[data2[key_3]['string_refs'][key1]]++;
+        }
+        else {
+          freq_target1[data2[key_3]['string_refs'][key1]] = 1;
+        }
+      }
+      for (var key1 in freq_target1) {
+        const subListItem_1 = document.createElement('div');
+        subListItem_1.className = "sub-list-item";
+        subListItem_1.textContent = key1 + ":" + freq_target1[key1].toString();
+        subList1.appendChild(subListItem_1);
+      }
+      lstItem1.appendChild(subList1);
+      target1_lst.appendChild(lstItem1);
+
+      lstItem1.addEventListener('click', () => {
+        svgElement2.style.transform = "rotate(90deg)";
+        if (subList1.style.display === "none") {
+          subList1.style.display = "block";
+        } else {
+          svgElement2.style.transform = "rotate(0deg)";
+          subList1.style.display = "none";
+        }
+      });
+    }
+
+
+
+    const source1_lst = document.getElementById('source1');
+    const source2_lst = document.getElementById('source2');
+    source1_lst.innerHTML = "";
+    source2_lst.innerHTML = "";
+
+    for (var key_3 in data1) {
+      const lstItem_1 = document.createElement("div");
+      lstItem_1.className = "list-item";
+      // lstItem.textContent = data1[key]['name'];
+      lstItem_1.style.cursor = "pointer";
+
+      const svgNamespace_1 = "http://www.w3.org/2000/svg";
+      const svgElement_1 = document.createElementNS(svgNamespace_1, "svg");
+      svgElement_1.setAttribute("width", "24");
+      svgElement_1.setAttribute("height", "24");
+      svgElement_1.setAttribute("viewBox", "0 0 24 24");
+      svgElement_1.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
+      const polygon_1 = document.createElementNS(svgNamespace_1, "polygon");
+      polygon_1.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
+      svgElement_1.appendChild(polygon_1);
+      svgElement_1.style.width = "20px";
+      svgElement_1.style.height = "20px";
+      lstItem_1.appendChild(svgElement_1);
+
+      const nameText_1 = document.createTextNode(data1[key_3]['name']);
+      lstItem_1.appendChild(nameText_1);
+
+      const subList_1 = document.createElement("div");
+      subList_1.style.display = "none";
+      subList_1.style.paddingLeft = "20px";
+      freq_target = {};
+      for (var key1 in data1[key_3]['ops_refs']) {
+        if (freq_target[data1[key_3]['ops_refs'][key1]]) {
+          freq_target[data1[key_3]['ops_refs'][key1]]++;
+        }
+        else {
+          freq_target[data1[key_3]['ops_refs'][key1]] = 1;
+        }
+      }
+      for (var key1 in freq_target) {
+        const subListItem_2 = document.createElement('div');
+        subListItem_2.className = "sub-list-item";
+        subListItem_2.textContent = key1 + ":" + freq_target[key1].toString();
+        subList_1.appendChild(subListItem_2);
+      }
+      lstItem_1.appendChild(subList_1);
+      source2_lst.appendChild(lstItem_1);
+
+      lstItem_1.addEventListener('click', () => {
+        svgElement_1.style.transform = "rotate(90deg)";
+        if (subList_1.style.display === "none") {
+          subList_1.style.display = "block";
+        } else {
+          svgElement_1.style.transform = "rotate(0deg)";
+          subList_1.style.display = "none";
+        }
+      });
+
+
+
+      const lstItem1_1 = document.createElement("div");
+      lstItem1_1.className = "list-item";
+      // lstItem1.textContent = data1[key]['name'];
+      lstItem1_1.style.cursor = "pointer";
+
+      const svgNamespace2_1 = "http://www.w3.org/2000/svg";
+      const svgElement2_1 = document.createElementNS(svgNamespace2_1, "svg");
+      svgElement2_1.setAttribute("width", "24");
+      svgElement2_1.setAttribute("height", "24");
+      svgElement2_1.setAttribute("viewBox", "0 0 24 24");
+      svgElement2_1.style.marginRight = "10px"; // Optional: Add margin to the right of the SVG
+      const polygon2_1 = document.createElementNS(svgNamespace2_1, "polygon");
+      polygon2_1.setAttribute("points", "7.293 4.707 14.586 12 7.293 19.293 8.707 20.707 17.414 12 8.707 3.293 7.293 4.707");
+      svgElement2_1.appendChild(polygon2_1);
+      svgElement2_1.style.width = "20px";
+      svgElement2_1.style.height = "20px";
+      lstItem1_1.appendChild(svgElement2_1);
+
+      const nameText2_1 = document.createTextNode(data1[key_3]['name']);
+      lstItem1_1.appendChild(nameText2_1);
+
+      const subList1_1 = document.createElement("div");
+      subList1_1.style.display = "none";
+      subList1_1.style.paddingLeft = "20px";
+
+      freq_target1 = {};
+      for (var key1 in data1[key_3]['string_refs']) {
+        if (freq_target1[data1[key_3]['string_refs'][key1]]) {
+          freq_target1[data1[key_3]['string_refs'][key1]]++;
+        }
+        else {
+          freq_target1[data1[key_3]['string_refs'][key1]] = 1;
+        }
+      }
+      for (var key1 in freq_target1) {
+        const subListItem_3 = document.createElement('div');
+        subListItem_3.className = "sub-list-item";
+        subListItem_3.textContent = key1 + ":" + freq_target1[key1].toString();
+        subList1_1.appendChild(subListItem_3);
+      }
+
+      lstItem1_1.appendChild(subList1_1);
+      source1_lst.appendChild(lstItem1_1);
+
+      lstItem1_1.addEventListener('click', () => {
+        svgElement2_1.style.transform = "rotate(90deg)";
+        if (subList1_1.style.display === "none") {
+          subList1_1.style.display = "block";
+        } else {
+          svgElement2_1.style.transform = "rotate(0deg)";
+          subList1_1.style.display = "none";
+        }
+      });
+
+    }
+    console.log("started second");
+    init_csv_parse(csvContent);
+    return;
+  } catch (error) {
+    console.error('Error:', error);
+  }
 
 }
 
@@ -584,10 +580,12 @@ function init_csv_parse(csvContent) {
 // get the side bar content
 console.log("program started first")
 //TO fetch init csv
+const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
 fetch(`view1?text=${encodeURIComponent('init')}`, {
   method: 'GET',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'X-Tab-ID': tabId,
   }
 })
   .then(response => response.json())
@@ -611,7 +609,7 @@ fetch(`view1?text=${encodeURIComponent('init')}`, {
 
 
 var csvContent = null;
-function neighbour_plot(eventData) {
+async function neighbour_plot(eventData) {
   const point = eventData.points[0];
   const text = point.text;  // Get the text attribute of the clicked point
   console.log(text, "neighbour data")
@@ -626,10 +624,12 @@ function neighbour_plot(eventData) {
   }
 
   // Send the text attribute back to Django using AJAX (GET request)
+  const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
   return fetch(`view1?text=${encodeURIComponent(text)}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Tab-ID': tabId,
     }
   })
     .then(function (response) {
@@ -858,10 +858,12 @@ function showDialog(tgt_fid, src_fid) {
 function fetchContent(tgt_fid, src_fid) {
   // console.log("fetch content is called target",tgt_fid);
   // console.log("fetch content is called source",src_fid);
+  const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
   fetch(`get_point_code?text=${encodeURIComponent(tgt_fid)}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Tab-ID': tabId,
     }
   })
     .then(response => {
@@ -895,11 +897,12 @@ function fetchContent(tgt_fid, src_fid) {
     .catch(error => {
       console.error('Fetch error:', error);
     });
-
+    
   fetch(`get_point_code?text=${encodeURIComponent(src_fid)}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Tab-ID': tabId
     }
   })
     .then(response => {
@@ -1120,11 +1123,12 @@ function get_neighbour_metadata(eventData) {
   const point = eventData.points[0]
   const text = point.text;
   let array = text.split("-")
-
+  const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
   fetch(`get_neighbour_metadata?text=${encodeURIComponent(text)}`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Tab-ID': tabId,
     }
   })
     .then(response => response.json())
