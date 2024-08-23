@@ -1,19 +1,19 @@
 
-VANTA.NET({
-el: "body",
-mouseControls: true,
-touchControls: true,
-gyroControls: false,
-minHeight: 200.0,
-minWidth: 200.0,
-scale: 1.0,
-scaleMobile: 1.0,
-color: 0xbcb8b1,
-backgroundColor: 0xf4f3ee,
-points: 9.0,
-maxDistance: 22.0,
-spacing: 19.0,
-});
+// VANTA.NET({
+// el: "body",
+// mouseControls: true,
+// touchControls: true,
+// gyroControls: false,
+// minHeight: 200.0,
+// minWidth: 200.0,
+// scale: 1.0,
+// scaleMobile: 1.0,
+// color: 0xbcb8b1,
+// backgroundColor: 0xf4f3ee,
+// points: 9.0,
+// maxDistance: 22.0,
+// spacing: 19.0,
+// });
 
 document.addEventListener('DOMContentLoaded', () => {
 let data1, data2, data3;
