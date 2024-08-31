@@ -209,6 +209,12 @@ body {
     height: calc(100vh - 20px);
   }
 
+  .un-plotly{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
 
 
   .dialog {

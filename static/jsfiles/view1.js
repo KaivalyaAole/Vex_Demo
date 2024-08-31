@@ -5,12 +5,33 @@ var minx1, miny1, minz1;
 var maxx1, maxy1, maxz1;
 var minx2, miny2, minz2;
 var maxx2, maxy2, maxz2;
-var source_filename = localStorage.getItem("FILE 1");
-var target_filename = localStorage.getItem("FILE 2");
+var tabid = sessionStorage.getItem('tabId');
+var source_filename = localStorage.getItem(`FILE_1_${tabid}`);
+var target_filename = localStorage.getItem(`FILE_2_${tabid}`);
+var plotlyInitialized = false;
 
 if (!source_filename) { source_filename = "binary-1"; }
 
 if (!target_filename) { target_filename = "binary-2"; }
+
+// Fallback for plotly
+window.addEventListener('load', () => {
+
+  const plotlyFallbackTimeout = setTimeout(() => {
+    if(!plotlyInitialized){
+      console.warn("Plotly is Unavailable.")
+      document.getElementById('myDiv').innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>';
+    }
+  }, 3000);
+
+  if(typeof Plotly === 'undefined'){
+    console.warn("Plotly is Unavailable.")
+    document.getElementById('myDiv').innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>'
+  }else{
+    plotlyInitialized = true;
+    clearTimeout(plotlyFallbackTimeout);
+  }
+})
 
 // var resetButton = document.createElement("button");
 // resetButton.id = "resetButton";
@@ -377,7 +398,12 @@ function init_plot() {
     }
   };
 
-  Plotly.newPlot('myDiv', init_data, init_layout);
+  if(plotlyInitialized){
+    Plotly.newPlot('myDiv', init_data, init_layout);
+  }else{
+    document.getElementById('myDiv').innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>'
+  }
+
   //Check if the reset button already exists
 
   // var resetButton = document.getElementById("resetButton");
@@ -804,7 +830,11 @@ function replotData(eventData, min, max) {
   var updatedData = [selected_func, neighbours];
   // resetButton.addEventListener("click", reset);
 
-  Plotly.newPlot('myDiv', updatedData, updatedLayout);
+  if(plotlyInitialized){
+    Plotly.newPlot('myDiv', updatedData, updatedLayout);
+  }else{
+    document.getElementById("myDiv").innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>'
+  }
 
 
   document.getElementById("myDiv").on("plotly_click", function (eventData) {
