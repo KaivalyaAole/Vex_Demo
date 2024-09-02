@@ -48,6 +48,7 @@ async function fill_binary_info() {
   
   // Show the loading SVG
   document.getElementById('loadingSvg1').style.display = 'block';
+  document.getElementById('loadingSvg2').style.display = 'block';
   try {
     const response = await fetch("get_binary_info", {
       method: 'GET',
@@ -76,6 +77,7 @@ async function fill_binary_info() {
     console.error('Error fetching binary info:', error);
   } finally {
     // Hide the loading SVG once the content has been loaded
+    document.getElementById('loadingSvg1').style.display = 'none';
     document.getElementById('loadingSvg2').style.display = 'none';
   }
 }
@@ -84,6 +86,8 @@ async function fill_binary_info() {
 async function fill_metadata(csvContent) {
   console.log("hitting the fill_metadata")
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
+  document.getElementById('loadingSvg3').style.display = 'block';
+  document.getElementById('loadingSvg4').style.display = 'block';
   fill_binary_info()
   try {
     const response = await fetch("get_all_metadata", {
@@ -345,7 +349,10 @@ async function fill_metadata(csvContent) {
   } catch (error) {
     console.error('Error:', error);
   }
-
+  finally{
+    document.getElementById('loadingSvg3').style.display = 'none';
+    document.getElementById('loadingSvg4').style.display = 'none';
+  }
 }
 
 function removeNaN(array) {
