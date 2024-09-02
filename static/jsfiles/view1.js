@@ -88,8 +88,8 @@ async function fill_metadata(csvContent) {
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
   document.getElementById('loadingSvg3').style.display = 'block';
   document.getElementById('loadingSvg4').style.display = 'block';
-  // document.getElementById('loadingSvg5').style.display = 'block';
-  // document.getElementById('loadingSvg6').style.display = 'block';
+  document.getElementById('loadingSvg5').style.display = 'block';
+  document.getElementById('loadingSvg6').style.display = 'block';
   fill_binary_info()
   try {
     const response = await fetch("get_all_metadata", {
@@ -354,8 +354,8 @@ async function fill_metadata(csvContent) {
   finally{
     document.getElementById('loadingSvg3').style.display = 'none';
     document.getElementById('loadingSvg4').style.display = 'none';
-    // document.getElementById('loadingSvg5').style.display = 'none';
-    // document.getElementById('loadingSvg6').style.display = 'none';
+    document.getElementById('loadingSvg5').style.display = 'none';
+    document.getElementById('loadingSvg6').style.display = 'none';
   }
 }
 
@@ -1149,8 +1149,8 @@ function get_neighbour_metadata(eventData) {
   const text = point.text;
   let array = text.split("-")
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
-  document.getElementById('loadingSvg5').style.display = 'block';
-  document.getElementById('loadingSvg6').style.display = 'block';
+  // document.getElementById('loadingSvg5').style.display = 'block';
+  // document.getElementById('loadingSvg6').style.display = 'block';
   fetch(`get_neighbour_metadata?text=${encodeURIComponent(text)}`, {
     method: 'GET',
     headers: {
@@ -1438,8 +1438,8 @@ function get_neighbour_metadata(eventData) {
         source2_lst.innerHTML = "Does Not Have Neighbouring Points"
       }
 
-      document.getElementById('loadingSvg5').style.display = 'none';
-      document.getElementById('loadingSvg6').style.display = 'none';
+      // document.getElementById('loadingSvg5').style.display = 'none';
+      // document.getElementById('loadingSvg6').style.display = 'none';
       console.error('Error:', error);
     });
 }
