@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function fetchDataAndPopulateLists() {
+        // Show loading SVGs
+        document.getElementById('loadingSvg1').style.display = 'block';
+        document.getElementById('loadingSvg2').style.display = 'block';
         // Fetch data1.json
         fetch(`get_all_code`,
             {
@@ -44,6 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(jsonData => {
+                // Hide loading SVGs
+                document.getElementById('loadingSvg1').style.display = 'none';
+                document.getElementById('loadingSvg2').style.display = 'none';
 
                 file1_id = jsonData['src_id']
                 file2_id = jsonData['tgt_id']
@@ -113,7 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }
             })
-            .catch(error => console.error('Error fetching data.json:', error));
+            .catch(error => {console.error('Error fetching data.json:', error);
+                // Hide loading SVGs in case of error
+                document.getElementById('loadingSvg1').style.display = 'none';
+                document.getElementById('loadingSvg2').style.display = 'none';
+            });
     }
 
     function populateDescriptions(text, file2_id) {
