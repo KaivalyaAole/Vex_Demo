@@ -45,25 +45,39 @@ function get_child_list(obj, objItem, filename) {
 
 async function fill_binary_info() {
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
-  const response = await fetch("get_binary_info", {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Tab-ID': tabId,
+  
+  // Show the loading SVG
+  document.getElementById('loadingSvg1').style.display = 'block';
+  try {
+    const response = await fetch("get_binary_info", {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Tab-ID': tabId,
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  });
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
+
+    const data = await response.json();
+    const src_obj = data['src'];
+    const tgt_obj = data['tgt'];
+    const source3_html = document.getElementById('source3');
+    const source4_html = document.getElementById('source4');
+    
+    source3_html.innerHTML = '';
+    source4_html.innerHTML = '';
+
+    get_child_list(src_obj, source3_html, source_filename);
+    get_child_list(tgt_obj, source4_html, target_filename);
+  } catch (error) {
+    console.error('Error fetching binary info:', error);
+  } finally {
+    // Hide the loading SVG once the content has been loaded
+    document.getElementById('loadingSvg2').style.display = 'none';
   }
-  const data = await response.json();
-  const src_obj = data['src'];
-  const tgt_obj = data['tgt'];
-  const source3_html = document.getElementById('source3');
-  const source4_html = document.getElementById('source4');
-  source3_html.innerHTML = '';
-  source4_html.innerHTML = '';
-  get_child_list(src_obj, source3_html, source_filename);
-  get_child_list(tgt_obj, source4_html, target_filename);
 }
 
 
