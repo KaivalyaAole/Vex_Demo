@@ -1,22 +1,3 @@
-
-// VANTA.NET({
-//     el: "body",
-//     mouseControls: true,
-//     touchControls: true,
-//     gyroControls: false,
-//     minHeight: 200.0,
-//     minWidth: 200.0,
-//     scale: 1.0,
-//     scaleMobile: 1.0,
-//     color: 0xbcb8b1,
-//     backgroundColor: 0xf4f3ee,
-//     points: 9.0,
-//     maxDistance: 22.0,
-//     spacing: 19.0,
-// });
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
     let data1, data2, data3;
     let selectedItem, selectedDescItem;
@@ -28,14 +9,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function fetchDataAndPopulateLists() {
         // Show loading SVGs
-        document.getElementById('loadingSvg1').style.display = 'block';
-        document.getElementById('loadingSvg2').style.display = 'block';
+        const svgElements = [
+            document.getElementById('loadingSvg1'),
+            document.getElementById('loadingSvg2')
+          ];
+          svgElements.forEach(svg => {
+            if (svg) {
+              svg.style.display = 'block';
+              svg.style.position = 'absolute';
+              svg.style.top= '33%';
+              svg.style.left= '35%';
+              svg.style.zIndex= '10';
+            }
+          });
         // Fetch data1.json
         fetch(`get_all_code`,
             {
                 method: 'GET',
-                headers: { 
-                    'Content-Type': 'application/json', 
+                headers: {
+                    'Content-Type': 'application/json',
                     'X-Tab-ID': tabId
                 }
             }
@@ -47,9 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.json();
             })
             .then(jsonData => {
-                // Hide loading SVGs
-                document.getElementById('loadingSvg1').style.display = 'none';
-                document.getElementById('loadingSvg2').style.display = 'none';
 
                 file1_id = jsonData['src_id']
                 file2_id = jsonData['tgt_id']
@@ -92,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 data2 = jsonData[file2_id];
                 const descriptionList = document.getElementById('descriptionList');
                 descriptionList.innerHTML = ''; // Clear existing descriptions
-                // data2.forEach(descItem => 
+                // data2.forEach(descItem =>
                 for (let key in data2) {
                     const listItem = document.createElement('div');
                     listItem.className = 'list-item';
@@ -118,17 +107,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     descriptionList.appendChild(listItem);
 
                 }
+                // Hide loading SVGs after data is processed
+                svgElements.forEach(svg => {
+                    if (svg) {
+                        svg.style.display = 'none';
+                    }
+                });
             })
-            .catch(error => {console.error('Error fetching data.json:', error);
-                // Hide loading SVGs in case of error
-                document.getElementById('loadingSvg1').style.display = 'none';
-                document.getElementById('loadingSvg2').style.display = 'none';
-            });
+            .catch(error => console.error('Error fetching data.json:', error));
     }
 
     function populateDescriptions(text, file2_id) {
         let previousListItem1 = null; // Declare variable to store previous selected list item in column 1
         let previousListItem2 = null;
+        document.getElementById('descriptionList').innerHTML = '';
+        const svgElements = [
+            document.getElementById('loadingSvg2')
+          ];
+          svgElements.forEach(svg => {
+            if (svg) {
+              svg.style.display = 'block';
+              svg.style.position = 'absolute';
+              svg.style.top= '33%';
+              svg.style.left= '35%';
+              svg.style.zIndex= '10';
+            }
+          });
         console.log("working populate descriptions");
         fetch(`get_neighbour_code?text=${encodeURIComponent(text)}`, {
             method: 'GET',
@@ -152,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const descriptionList = document.getElementById('descriptionList');
                 descriptionList.innerHTML = '';
-                // data3.forEach(descItem => 
+                // data3.forEach(descItem =>
                 // for (let key2 in data3){
                 //     let string_name="";
                 //     if(data3[key2][1]['score']>75)
@@ -167,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 //         string_name= "farthest";
                 //     }
                 //     const listItem = document.createElement('div');
-                //     listItem.className = 'list-item'; 
+                //     listItem.className = 'list-item';
                 //     listItem.textContent = data3[key2][1]['name']+" : "+string_name;
 
                 for (let key2 in data3) {
@@ -219,6 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         listItem.style.backgroundColor = '';
                     });
                     descriptionList.appendChild(listItem);
+
+                    // Hide the loader once data is loaded and the list is populated
+                    svgElements.forEach(svg => {
+                        if (svg) {
+                            svg.style.display = 'none';
+                        }
+                    });
                 };
             })
             .catch(error => console.error('Error fetching data3.json:', error));
@@ -227,6 +238,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateItemsFromData3(text, file1_id) {
         let previousListItem1 = null; // Declare variable to store previous selected list item in column 1
         let previousListItem2 = null;
+        document.getElementById('itemList').innerHTML = '';
+        const svgElements = [
+            document.getElementById('loadingSvg1')
+          ];
+          svgElements.forEach(svg => {
+            if (svg) {
+              svg.style.display = 'block';
+              svg.style.position = 'absolute';
+              svg.style.top= '33%';
+              svg.style.left= '35%';
+              svg.style.zIndex= '10';
+            }
+          });
         fetch(`get_neighbour_code?text=${encodeURIComponent(text)}`, {
             method: 'GET',
             headers: {
@@ -247,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 data3 = Object.entries(data3)
                 data3.sort((a, b) => b[1].score - a[1].score)
 
-                // data3.forEach(item => 
+                // data3.forEach(item =>
                 // for (let key2 in data3)
                 // {
                 //     let string_name="";
@@ -328,6 +352,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         listItem.style.backgroundColor = '';
                     });
                     itemList.appendChild(listItem);
+                    // Hide the loader once data is loaded and the list is populated
+                    svgElements.forEach(svg => {
+                        if (svg) {
+                        svg.style.display = 'none';
+                        }
+                    });
                 }
             })
             .catch(error => console.error('Error fetching data3.json:', error));

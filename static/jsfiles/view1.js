@@ -8,10 +8,46 @@ var maxx2, maxy2, maxz2;
 var tabid = sessionStorage.getItem('tabId');
 var source_filename = localStorage.getItem(`FILE_1_${tabid}`);
 var target_filename = localStorage.getItem(`FILE_2_${tabid}`);
+var plotlyInitialized = false;
 
 if (!source_filename) { source_filename = "binary-1"; }
 
 if (!target_filename) { target_filename = "binary-2"; }
+
+// Fallback for plotly
+window.addEventListener('load', () => {
+  const svgElements = [
+    document.getElementById('plotly-loadingSvg'),
+  ];
+  svgElements.forEach(svg => {
+    if (svg){
+      svg.style.display = 'block';
+      svg.style.width = '50%';
+      svg.style.height = '50%';
+      svg.style.margin = 'auto';
+      svg.style.position = 'absolute';
+      svg.style.top= '39%';
+      svg.style.left= '45%';
+      svg.style.zIndex= '10';
+      svg.style.opacity= '100%';
+    }
+  });
+
+  const plotlyFallbackTimeout = setTimeout(() => {
+    if(!plotlyInitialized){
+      console.warn("Plotly is Unavailable.")
+      document.getElementById('myDiv').innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>';
+    }
+  }, 3000);
+
+  if(typeof Plotly === 'undefined'){
+    console.warn("Plotly is Unavailable.")
+    document.getElementById('myDiv').innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>'
+  }else{
+    plotlyInitialized = true;
+    clearTimeout(plotlyFallbackTimeout);
+  }
+})
 
 // var resetButton = document.createElement("button");
 // resetButton.id = "resetButton";
@@ -45,10 +81,21 @@ function get_child_list(obj, objItem, filename) {
 
 async function fill_binary_info() {
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
-  
   // Show the loading SVG
-  document.getElementById('loadingSvg1').style.display = 'block';
-  document.getElementById('loadingSvg2').style.display = 'block';
+  const svgElements = [
+    document.getElementById('loadingSvg1'),
+    document.getElementById('loadingSvg2'),
+  ];
+  svgElements.forEach(svg => {
+    if (svg){
+      svg.style.display = 'block';
+      svg.style.width = '50%';
+      svg.style.height = '50%';
+      svg.style.margin = 'auto';
+      svg.style.position = 'relative';
+      svg.style.opacity= '100%';
+    }
+  });
   try {
     const response = await fetch("get_binary_info", {
       method: 'GET',
@@ -57,28 +104,20 @@ async function fill_binary_info() {
         'X-Tab-ID': tabId,
       }
     });
-
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-
     const data = await response.json();
     const src_obj = data['src'];
     const tgt_obj = data['tgt'];
     const source3_html = document.getElementById('source3');
     const source4_html = document.getElementById('source4');
-    
     source3_html.innerHTML = '';
     source4_html.innerHTML = '';
-
     get_child_list(src_obj, source3_html, source_filename);
     get_child_list(tgt_obj, source4_html, target_filename);
   } catch (error) {
     console.error('Error fetching binary info:', error);
-  } finally {
-    // Hide the loading SVG once the content has been loaded
-    document.getElementById('loadingSvg1').style.display = 'none';
-    document.getElementById('loadingSvg2').style.display = 'none';
   }
 }
 
@@ -86,10 +125,30 @@ async function fill_binary_info() {
 async function fill_metadata(csvContent) {
   console.log("hitting the fill_metadata")
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
-  document.getElementById('loadingSvg3').style.display = 'block';
-  document.getElementById('loadingSvg4').style.display = 'block';
-  document.getElementById('loadingSvg5').style.display = 'block';
-  document.getElementById('loadingSvg6').style.display = 'block';
+  const svgElements = [
+    document.getElementById('loadingSvg3'),
+    document.getElementById('loadingSvg4'),
+    document.getElementById('loadingSvg5'),
+    document.getElementById('loadingSvg6')
+  ];
+
+  svgElements[0].style.top = '39%';
+  svgElements[0].style.left = '35%';
+  svgElements[1].style.top = '39%';
+  svgElements[1].style.left = '35%';
+  svgElements[2].style.top = '73%';
+  svgElements[2].style.left = '35%';
+  svgElements[3].style.top = '73%';
+  svgElements[3].style.left = '35%';
+
+  svgElements.forEach(svg => {
+    if (svg) {
+      svg.style.display = 'block';
+      svg.style.position = 'absolute';
+      svg.style.opacity = '100%';
+    }
+  });
+
   fill_binary_info()
   try {
     const response = await fetch("get_all_metadata", {
@@ -352,11 +411,13 @@ async function fill_metadata(csvContent) {
     console.error('Error:', error);
   }
   finally{
-    document.getElementById('loadingSvg3').style.display = 'none';
-    document.getElementById('loadingSvg4').style.display = 'none';
-    document.getElementById('loadingSvg5').style.display = 'none';
-    document.getElementById('loadingSvg6').style.display = 'none';
+      svgElements.forEach(svg => {
+        if (svg) {
+            svg.style.display = 'none';
+        }
+    });
   }
+
 }
 
 function removeNaN(array) {
@@ -398,7 +459,30 @@ function init_plot() {
     }
   };
 
-  Plotly.newPlot('myDiv', init_data, init_layout);
+
+  if(plotlyInitialized){
+    const svgElements = [
+      document.getElementById('plotly-loadingSvg'),
+    ];
+    svgElements.forEach(svg => {
+      if (svg){
+      svg.style.display = 'block';
+      svg.style.width = '50%';
+      svg.style.height = '50%';
+      svg.style.margin = 'auto';
+      svg.style.position = 'absolute';
+      svg.style.top= '39%';
+      svg.style.left= '45%';
+      svg.style.zIndex= '10';
+      svg.style.opacity= '100%';
+    }
+    });
+    Plotly.newPlot('myDiv', init_data, init_layout);
+    document.getElementById("plotly-loadingSvg").style.display = "none";
+  }else{
+    document.getElementById('myDiv').innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>'
+  }
+
   //Check if the reset button already exists
 
   // var resetButton = document.getElementById("resetButton");
@@ -433,16 +517,57 @@ function init_plot() {
   // document.getElementById("resetButton").addEventListener("click", reset);
   ///////////////////
   // console.log("plotly click from inti plot called");
-  document.getElementById("myDiv").on("plotly_click", function (eventData) {
-    // console.log("plotly click from inti plot called");
-    neighbour_plot(eventData).catch(function (error) {
-      // Handle any errors from fetchData() or subsequent handling
-      console.error('Error New:', error);
-    });;
-    // console.log(eventData,"pranay");
-    selected_meta_data(eventData)
-    get_neighbour_metadata(eventData);
-  });
+document.getElementById("myDiv").on("plotly_click", function (eventData) {
+    const svgElements = [
+        document.getElementById('plotly-loadingSvg'),
+    ];
+
+    svgElements.forEach(svg => {
+      if (svg){
+        svg.style.display = 'block';
+        svg.style.width = '50%';
+        svg.style.height = '50%';
+        svg.style.margin = 'auto';
+        svg.style.position = 'absolute';
+        svg.style.top = '39%';
+        svg.style.left = '45%';
+        svg.style.zIndex = '10';
+        svg.style.opacity= '100%';
+      }
+    });
+
+    const div = document.getElementById('myDiv');
+
+    // Apply blur styles
+    div.style.opacity = '0.4';  // Set opacity to 40%
+    div.style.pointerEvents = 'none';  // Disable pointer events
+
+    // Fetch data and then restore the plot
+    Promise.all([
+        neighbour_plot(eventData),
+        selected_meta_data(eventData),
+        get_neighbour_metadata(eventData)
+    ]).then(() => {
+        // Restore visibility once data is fetched
+        svgElements.forEach(svg => {
+            svg.style.display = 'none';
+        });
+
+        div.style.opacity = '1';  // Reset opacity to full visibility
+        div.style.pointerEvents = 'auto';  // Re-enable pointer events
+    }).catch(function (error) {
+        // Handle any errors from fetchData() or subsequent handling
+        console.error('Error New:', error);
+
+        // In case of error, also restore the UI state
+        svgElements.forEach(svg => {
+            svg.style.display = 'none';
+        });
+
+        div.style.opacity = '1';  // Reset opacity to full visibility
+        div.style.pointerEvents = 'auto';  // Re-enable pointer events
+    });
+});
 }
 
 
@@ -829,10 +954,47 @@ function replotData(eventData, min, max) {
   var updatedData = [selected_func, neighbours];
   // resetButton.addEventListener("click", reset);
 
-  Plotly.newPlot('myDiv', updatedData, updatedLayout);
+  if(plotlyInitialized){
+    const svgElements = [
+      document.getElementById('plotly-loadingSvg'),
+    ];
+    svgElements.forEach(svg => {
+      if (svg){
+        svg.style.display = 'block';
+        svg.style.width = '50%';
+        svg.style.height = '50%';
+        svg.style.margin = 'auto';
+        svg.style.position = 'absolute';
+        svg.style.top= '39%';
+        svg.style.left= '45%';
+        svg.style.zIndex= '10';
+        svg.style.opacity= '100%';
+      }
+    });
+    Plotly.newPlot('myDiv', updatedData, updatedLayout);
+    document.getElementById("plotly-loadingSvg").style.display = "none";
+  }else{
+    document.getElementById("myDiv").innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>'
+  }
 
 
   document.getElementById("myDiv").on("plotly_click", function (eventData) {
+    const svgElements = [
+      document.getElementById('plotly-loadingSvg'),
+    ];
+    svgElements.forEach(svg => {
+      if (svg){
+        svg.style.display = 'block';
+        svg.style.width = '50%';
+        svg.style.height = '50%';
+        svg.style.margin = 'auto';
+        svg.style.position = 'absolute';
+        svg.style.top= '39%';
+        svg.style.left= '45%';
+        svg.style.zIndex= '10';
+        svg.style.opacity= '100%';
+      }
+    });
     // console.log("Selected_func: "+ selected_func.text)
     // console.log(eventData)
     // console.log(point.text)
@@ -841,6 +1003,7 @@ function replotData(eventData, min, max) {
       return
     }
     else {
+      document.getElementById("plotly-loadingSvg").style.display = "none";
       document.getElementById('irSourceText').innerHTML = "Loading your content..."
       document.getElementById('asmSourceText').innerHTML = "Loading your content...";
       document.getElementById('sourceSourceText').innerHTML = "Loading your content..."
@@ -922,7 +1085,7 @@ function fetchContent(tgt_fid, src_fid) {
     .catch(error => {
       console.error('Fetch error:', error);
     });
-    
+
   fetch(`get_point_code?text=${encodeURIComponent(src_fid)}`, {
     method: 'GET',
     headers: {
@@ -1149,8 +1312,6 @@ function get_neighbour_metadata(eventData) {
   const text = point.text;
   let array = text.split("-")
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
-  // document.getElementById('loadingSvg5').style.display = 'block';
-  // document.getElementById('loadingSvg6').style.display = 'block';
   fetch(`get_neighbour_metadata?text=${encodeURIComponent(text)}`, {
     method: 'GET',
     headers: {
@@ -1438,21 +1599,18 @@ function get_neighbour_metadata(eventData) {
         source2_lst.innerHTML = "Does Not Have Neighbouring Points"
       }
 
-      // document.getElementById('loadingSvg5').style.display = 'none';
-      // document.getElementById('loadingSvg6').style.display = 'none';
       console.error('Error:', error);
     });
 }
 
 function reset() {
+  document.getElementById('source1').innerHTML = '';
+  document.getElementById('target1').innerHTML = '';
+  document.getElementById('source2').innerHTML = '';
+  document.getElementById('target2').innerHTML = '';
   fill_metadata();
   fill_binary_info()
   init_plot();
 
 
 }
-
-
-
-
-
