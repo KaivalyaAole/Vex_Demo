@@ -20,13 +20,13 @@ window.addEventListener('load', () => {
   const plotlyFallbackTimeout = setTimeout(() => {
     if(!plotlyInitialized){
       console.warn("Plotly is Unavailable.")
-      document.getElementById('myDiv').innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>';
+      document.getElementById('myDiv').innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>';
     }
   }, 3000);
 
   if(typeof Plotly === 'undefined'){
     console.warn("Plotly is Unavailable.")
-    document.getElementById('myDiv').innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>'
+    document.getElementById('myDiv').innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>'
   }else{
     plotlyInitialized = true;
     clearTimeout(plotlyFallbackTimeout);
@@ -401,7 +401,7 @@ function init_plot() {
   if(plotlyInitialized){
     Plotly.newPlot('myDiv', init_data, init_layout);
   }else{
-    document.getElementById('myDiv').innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>'
+    document.getElementById('myDiv').innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>'
   }
 
   //Check if the reset button already exists
@@ -833,7 +833,7 @@ function replotData(eventData, min, max) {
   if(plotlyInitialized){
     Plotly.newPlot('myDiv', updatedData, updatedLayout);
   }else{
-    document.getElementById("myDiv").innerHTML = '<div class="un-plotly">Plotly is currently Unavailable</div>'
+    document.getElementById("myDiv").innerHTML = '<div class="un-plotly"><p>Unable to load the graphical view at the moment...</p><p> Please try again later.</p></div>'
   }
 
 
