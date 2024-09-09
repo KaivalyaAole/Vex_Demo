@@ -108,6 +108,8 @@ async function fill_binary_info() {
       throw new Error('Network response was not ok');
     }
     const data = await response.json();
+    var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+    SomethingWentWrongerrorMessage.style.display = "none";
     const src_obj = data['src'];
     const tgt_obj = data['tgt'];
     const source3_html = document.getElementById('source3');
@@ -117,7 +119,8 @@ async function fill_binary_info() {
     get_child_list(src_obj, source3_html, source_filename);
     get_child_list(tgt_obj, source4_html, target_filename);
   } catch (error) {
-    console.error('Error fetching binary info:', error);
+    // console.error('Error fetching binary info:', error);
+    SomethingWentWrongerrorMessage.style.display = "block";
   }
 }
 
@@ -131,6 +134,8 @@ async function fill_metadata(csvContent) {
     document.getElementById('loadingSvg5'),
     document.getElementById('loadingSvg6')
   ];
+  var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+  SomethingWentWrongerrorMessage.style.display = "none";
 
   svgElements[0].style.top = '39%';
   svgElements[0].style.left = '35%';
@@ -408,7 +413,8 @@ async function fill_metadata(csvContent) {
     init_csv_parse(csvContent);
     return;
   } catch (error) {
-    console.error('Error:', error);
+    // console.error('Error:', error);
+    SomethingWentWrongerrorMessage.style.display = "block";
   }
   finally{
       svgElements.forEach(svg => {
@@ -541,6 +547,8 @@ document.getElementById("myDiv").on("plotly_click", function (eventData) {
     // Apply blur styles
     div.style.opacity = '0.4';  // Set opacity to 40%
     div.style.pointerEvents = 'none';  // Disable pointer events
+    var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+    SomethingWentWrongerrorMessage.style.display = "none";
 
     // Fetch data and then restore the plot
     Promise.all([
@@ -557,7 +565,8 @@ document.getElementById("myDiv").on("plotly_click", function (eventData) {
         div.style.pointerEvents = 'auto';  // Re-enable pointer events
     }).catch(function (error) {
         // Handle any errors from fetchData() or subsequent handling
-        console.error('Error New:', error);
+        // console.error('Error New:', error);
+        SomethingWentWrongerrorMessage.style.display = "block";
 
         // In case of error, also restore the UI state
         svgElements.forEach(svg => {
@@ -1047,6 +1056,8 @@ function fetchContent(tgt_fid, src_fid) {
   // console.log("fetch content is called target",tgt_fid);
   // console.log("fetch content is called source",src_fid);
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
+  var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+  SomethingWentWrongerrorMessage.style.display = "none";
   fetch(`get_point_code?text=${encodeURIComponent(tgt_fid)}`, {
     method: 'GET',
     headers: {
@@ -1079,11 +1090,13 @@ function fetchContent(tgt_fid, src_fid) {
         ).value;
 
       } else {
-        console.error('Error sending text attribute:', data.message); x
+        // console.error('Error sending text attribute:', data.message);
+        SomethingWentWrongerrorMessage.style.display = "block";
       }
     })
     .catch(error => {
-      console.error('Fetch error:', error);
+      // console.error('Fetch error:', error);
+      SomethingWentWrongerrorMessage.style.display = "block";
     });
 
   fetch(`get_point_code?text=${encodeURIComponent(src_fid)}`, {
@@ -1121,11 +1134,13 @@ function fetchContent(tgt_fid, src_fid) {
           { language: 'C' }
         ).value;
       } else {
-        console.error('Error sending text attribute:', data.message);
+        // console.error('Error sending text attribute:', data.message);
+        SomethingWentWrongerrorMessage.style.display = "block";
       }
     })
     .catch(error => {
-      console.error('Fetch error:', error);
+      // console.error('Fetch error:', error);
+      SomethingWentWrongerrorMessage.style.display = "block";
     });
 
   displayContent(1);
@@ -1310,6 +1325,8 @@ function get_neighbour_metadata(eventData) {
   // console.log("get _ neighbour function execution");
   const point = eventData.points[0]
   const text = point.text;
+  var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+  SomethingWentWrongerrorMessage.style.display = "none";
   let array = text.split("-")
   const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
   fetch(`get_neighbour_metadata?text=${encodeURIComponent(text)}`, {
@@ -1599,7 +1616,8 @@ function get_neighbour_metadata(eventData) {
         source2_lst.innerHTML = "Does Not Have Neighbouring Points"
       }
 
-      console.error('Error:', error);
+      // console.error('Error:', error);
+      SomethingWentWrongerrorMessage.style.display = "block";
     });
 }
 

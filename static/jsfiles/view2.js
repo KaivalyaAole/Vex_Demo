@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let previousListItem1 = null; // Declare variable to store previous selected list item in column 1
     let previousListItem2 = null; // Declare variable to store previous selected list item in column
     const tabId = sessionStorage.getItem('tabId') || 'default-tab-id';
+    var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+    SomethingWentWrongerrorMessage.style.display = "none";
 
 
     function fetchDataAndPopulateLists() {
@@ -114,12 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             })
-            .catch(error => console.error('Error fetching data.json:', error));
+            .catch(error => {
+                // console.error('Error fetching data3.json:', error);
+                SomethingWentWrongerrorMessage.style.display = "block";
+            });
     }
 
     function populateDescriptions(text, file2_id) {
         let previousListItem1 = null; // Declare variable to store previous selected list item in column 1
         let previousListItem2 = null;
+        var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+        SomethingWentWrongerrorMessage.style.display = "none";
         document.getElementById('descriptionList').innerHTML = '';
         const svgElements = [
             document.getElementById('loadingSvg2')
@@ -232,12 +239,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 };
             })
-            .catch(error => console.error('Error fetching data3.json:', error));
+            .catch(error => {
+                // console.error('Error fetching data3.json:', error);
+                SomethingWentWrongerrorMessage.style.display = "block";
+            });
     }
 
     function populateItemsFromData3(text, file1_id) {
         let previousListItem1 = null; // Declare variable to store previous selected list item in column 1
         let previousListItem2 = null;
+        var SomethingWentWrongerrorMessage = document.getElementById("something-went-wrong-error");
+        SomethingWentWrongerrorMessage.style.display = "none";
         document.getElementById('itemList').innerHTML = '';
         const svgElements = [
             document.getElementById('loadingSvg1')
@@ -360,7 +372,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             })
-            .catch(error => console.error('Error fetching data3.json:', error));
+            .catch(error => {
+                // console.error('Error fetching data3.json:', error);
+                SomethingWentWrongerrorMessage.style.display = "block";
+            });
     }
 
 
