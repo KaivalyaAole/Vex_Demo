@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(jsonData => {
 
+
                 file1_id = jsonData['src_id']
                 file2_id = jsonData['tgt_id']
 
